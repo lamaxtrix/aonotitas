@@ -1,6 +1,11 @@
 let colorActual = "#ffff00";
 let resaltados = {};
 
+// Variables para el arrastre
+let arrastrando = false;
+let offsetX = 0;
+let offsetY = 0;
+
 //Helpers
 const generarId = () => "res_" + Math.random().toString(36).substr(2, 9);
 
@@ -15,6 +20,73 @@ const cargarResaltados = () => {
   });
 };
 
+// Función para hacer el panel arrastrable
+const hacerArrastrable = (panel) => {
+  const header = panel.querySelector('.panel-header');
+  
+  header.addEventListener('mousedown', (e) => {
+    arrastrando = true;
+    const rect = panel.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+    
+    // Cambiar cursor y agregar clase visual
+    header.style.cursor = 'grabbing';
+    panel.classList.add('arrastrando');
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!arrastrando) return;
+    
+    e.preventDefault();
+    
+    // Calcular nueva posición
+    let newX = e.clientX - offsetX;
+    let newY = e.clientY - offsetY;
+    
+    // Limitar el movimiento dentro de la ventana
+    const panelRect = panel.getBoundingClientRect();
+    const maxX = window.innerWidth - panelRect.width;
+    const maxY = window.innerHeight - panelRect.height;
+    
+    newX = Math.max(0, Math.min(newX, maxX));
+    newY = Math.max(0, Math.min(newY, maxY));
+    
+    // Aplicar nueva posición
+    panel.style.left = newX + 'px';
+    panel.style.top = newY + 'px';
+    panel.style.right = 'auto'; // Cancelar el right fijo
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (arrastrando) {
+      arrastrando = false;
+      header.style.cursor = 'grab';
+      panel.classList.remove('arrastrando');
+      
+      // Guardar posición en storage
+      const rect = panel.getBoundingClientRect();
+      chrome.storage.local.set({
+        panelPosition: {
+          x: rect.left,
+          y: rect.top
+        }
+      });
+    }
+  });
+};
+
+// Función para restaurar la posición del panel
+const restaurarPosicionPanel = (panel) => {
+  chrome.storage.local.get("panelPosition", (data) => {
+    if (data.panelPosition) {
+      panel.style.left = data.panelPosition.x + 'px';
+      panel.style.top = data.panelPosition.y + 'px';
+      panel.style.right = 'auto';
+    }
+  });
+};
+
 //Panel flotante
 const crearPanelFlotante = () => {
   if (document.getElementById("panel-flotante")) return;
@@ -22,19 +94,30 @@ const crearPanelFlotante = () => {
   const panel = document.createElement("div");
   panel.id = "panel-flotante";
   panel.innerHTML = `
-    <h4>AOnotita</h4>
-    <label for="selector-color">Color:</label>
-    <input type="color" id="selector-color" value="${colorActual}">
-    <div class="instrucciones">
-      <p><b>Instrucciones:</b></p>
-      <ul>
-        <li>Selecciona texto y presiona <b>H</b> para resaltar.</li>
-        <li>Añade anotación (opcional) en el prompt.</li>
-        <li>Selecciona texto resaltado y presiona <b>D</b> para borrar.</li>
-      </ul>
+    <div class="panel-header">
+      <h4>AOnotitas</h4>
+      <span class="drag-indicator">⋮⋮</span>
+    </div>
+    <div class="panel-content">
+      <label for="selector-color">Color:</label>
+      <input type="color" id="selector-color" value="${colorActual}">
+      <div class="instrucciones">
+        <p><b>Instrucciones:</b></p>
+        <ul>
+          <li>Selecciona texto y presiona <b>1</b> para resaltar.</li>
+          <li>Añade anotación (opcional) en el prompt.</li>
+          <li>Selecciona texto resaltado y presiona <b>2</b> para borrar.</li>
+        </ul>
+      </div>
     </div>
   `;
   document.body.appendChild(panel);
+
+  // Hacer el panel arrastrable
+  hacerArrastrable(panel);
+  
+  // Restaurar posición guardada
+  restaurarPosicionPanel(panel);
 
   document.getElementById("selector-color").addEventListener("input", (e) => {
     colorActual = e.target.value;
@@ -130,6 +213,6 @@ cargarResaltados();
 //Atajos de teclado
 document.addEventListener("keydown", (e) => {
   const tecla = e.key.toLowerCase();
-  if (tecla === "h") { e.preventDefault(); resaltar(); }
-  if (tecla === "d") { e.preventDefault(); borrarResaltado(); }
+  if (tecla === "1") { e.preventDefault(); resaltar(); }
+  if (tecla === "2") { e.preventDefault(); borrarResaltado(); }
 });
