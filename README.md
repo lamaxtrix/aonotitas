@@ -1,4 +1,4 @@
-# AO3 Highlighter & Notes ✨
+# AO3 Resaltador y Anotaciones ✨
 
 Extensión de navegador para **resaltar texto y añadir notas en AO3 (Archive of Our Own)** mientras lees fanfics.  
 Guarda tus anotaciones y mejora tu experiencia de lectura.
