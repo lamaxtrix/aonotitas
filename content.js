@@ -30,7 +30,6 @@ const hacerArrastrable = (panel) => {
     offsetX = e.clientX - rect.left;
     offsetY = e.clientY - rect.top;
     
-    // Cambiar cursor y agregar clase visual
     header.style.cursor = 'grabbing';
     panel.classList.add('arrastrando');
   });
@@ -40,11 +39,9 @@ const hacerArrastrable = (panel) => {
     
     e.preventDefault();
     
-    // Calcular nueva posición
     let newX = e.clientX - offsetX;
     let newY = e.clientY - offsetY;
     
-    // Limitar el movimiento dentro de la ventana
     const panelRect = panel.getBoundingClientRect();
     const maxX = window.innerWidth - panelRect.width;
     const maxY = window.innerHeight - panelRect.height;
@@ -52,10 +49,9 @@ const hacerArrastrable = (panel) => {
     newX = Math.max(0, Math.min(newX, maxX));
     newY = Math.max(0, Math.min(newY, maxY));
     
-    // Aplicar nueva posición
     panel.style.left = newX + 'px';
     panel.style.top = newY + 'px';
-    panel.style.right = 'auto'; // Cancelar el right fijo
+    panel.style.right = 'auto';
   });
 
   document.addEventListener('mouseup', () => {
@@ -64,7 +60,6 @@ const hacerArrastrable = (panel) => {
       header.style.cursor = 'grab';
       panel.classList.remove('arrastrando');
       
-      // Guardar posición en storage
       const rect = panel.getBoundingClientRect();
       chrome.storage.local.set({
         panelPosition: {
@@ -95,7 +90,7 @@ const crearPanelFlotante = () => {
   panel.id = "panel-flotante";
   panel.innerHTML = `
     <div class="panel-header">
-      <h4>AOnotitas</h4>
+      <h4>AOnotita</h4>
       <span class="drag-indicator">⋮⋮</span>
     </div>
     <div class="panel-content">
@@ -113,10 +108,7 @@ const crearPanelFlotante = () => {
   `;
   document.body.appendChild(panel);
 
-  // Hacer el panel arrastrable
   hacerArrastrable(panel);
-  
-  // Restaurar posición guardada
   restaurarPosicionPanel(panel);
 
   document.getElementById("selector-color").addEventListener("input", (e) => {
@@ -212,7 +204,13 @@ cargarResaltados();
 
 //Atajos de teclado
 document.addEventListener("keydown", (e) => {
-  const tecla = e.key.toLowerCase();
-  if (tecla === "1") { e.preventDefault(); resaltar(); }
-  if (tecla === "2") { e.preventDefault(); borrarResaltado(); }
+  const tecla = e.key;
+  if (tecla === "1") { 
+    e.preventDefault(); 
+    resaltar(); 
+  }
+  if (tecla === "2") { 
+    e.preventDefault(); 
+    borrarResaltado(); 
+  }
 });
