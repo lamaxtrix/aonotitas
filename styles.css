@@ -6,27 +6,123 @@
   background: #fffdf8;
   border: 2px solid #cc0000;
   border-radius: 12px;
-  padding: 10px;
+  padding: 0;
   z-index: 9999;
   font-family: Arial, sans-serif;
   font-size: 14px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  user-select: none; /* Evitar selección de texto durante el arrastre */
+  transition: box-shadow 0.2s ease;
 }
 
-#panel-flotante h4 {
-  margin: 0 0 5px 0;
+/* Efecto visual cuando se está arrastrando */
+#panel-flotante.arrastrando {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  transform: rotate(1deg);
+}
+
+/* Header del panel (área de arrastre) */
+.panel-header {
+  background: linear-gradient(135deg, #cc0000, #aa0000);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 10px 10px 0 0;
+  cursor: grab;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.panel-header:active {
+  cursor: grabbing;
+}
+
+.panel-header h4 {
+  margin: 0;
   font-size: 16px;
-  color: #cc0000;
+  font-weight: bold;
+  flex-grow: 1;
+}
+
+/* Indicador visual de que se puede arrastrar */
+.drag-indicator {
+  font-size: 12px;
+  opacity: 0.7;
+  letter-spacing: -2px;
+  transform: rotate(90deg);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Contenido del panel */
+.panel-content {
+  padding: 10px;
+}
+
+.panel-content label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
   font-weight: bold;
 }
 
-#panel-flotante ul {
-  margin: 5px 0;
+#selector-color {
+  width: 100%;
+  height: 30px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.instrucciones {
+  background: #f8f8f8;
+  border-radius: 8px;
+  padding: 8px;
+  border-left: 3px solid #cc0000;
+}
+
+.instrucciones p {
+  margin: 0 0 5px 0;
+  color: #cc0000;
+  font-size: 13px;
+}
+
+.instrucciones ul {
+  margin: 5px 0 0 0;
   padding-left: 18px;
+}
+
+.instrucciones li {
+  margin-bottom: 3px;
+  font-size: 12px;
+  line-height: 1.3;
 }
 
 .resaltado {
   padding: 2px;
   border-radius: 3px;
   cursor: pointer;
+}
+
+/* Animación suave para transiciones */
+#panel-flotante {
+  transition: transform 0.1s ease-out;
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 480px) {
+  #panel-flotante {
+    width: 200px;
+    font-size: 12px;
+  }
+  
+  .panel-header h4 {
+    font-size: 14px;
+  }
+  
+  .instrucciones li {
+    font-size: 11px;
+  }
 }
